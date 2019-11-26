@@ -4,6 +4,20 @@ from tkinter import *
 import os
 
 
+def four_consecutive_chars(check_string):
+    count = {}
+    for s in check_string:
+        if s in count:
+            count[s] += 1
+        else:
+            count[s] = 1
+
+    for key in count:
+        if count[key] > 3:
+            return True
+    return False
+
+
 def valid_password(user_password):
     if len(user_password) < 8:
         return False
@@ -11,9 +25,12 @@ def valid_password(user_password):
         return False
     if not any(char.isalpha() for char in user_password):
         return False
+    if four_consecutive_chars(user_password):
+        return False
     return True
 
 # Designing window for registration
+
 
 def register():
     global register_screen
