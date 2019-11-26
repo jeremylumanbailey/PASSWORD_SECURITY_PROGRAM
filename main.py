@@ -2,6 +2,16 @@
 
 from tkinter import *
 import os
+highly_popular_pws = open("popularpasswords.txt", 'r')
+
+
+def search_common_pws(check_string):
+    for x in highly_popular_pws:
+        if check_string in x:
+            print("found common password")
+            return True
+    print("not found common password")
+    return False
 
 
 def four_consecutive_chars(check_string):
@@ -26,6 +36,8 @@ def valid_password(user_password):
     if not any(char.isalpha() for char in user_password):
         return False
     if four_consecutive_chars(user_password):
+        return False
+    if search_common_pws(user_password):
         return False
     return True
 
