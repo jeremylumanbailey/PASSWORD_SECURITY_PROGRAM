@@ -4,6 +4,10 @@ from tkinter import *
 import os
 
 
+def valid_password(user_password):
+    return True
+
+
 # Designing window for registration
 
 def register():
@@ -69,15 +73,20 @@ def register_user():
     username_info = username.get()
     password_info = password.get()
 
-    file = open("passwords", "a")
-    file.write("\n" + username_info + "\n")
-    file.write(password_info)
-    file.close()
+    if valid_password(password_info):
+        # TODO password_info = encrypt_password(password_info)
+        file = open("passwords.txt", "a")
+        file.write("\n" + username_info + "\n")
+        file.write(password_info)
+        file.close()
 
-    username_entry.delete(0, END)
-    password_entry.delete(0, END)
+        username_entry.delete(0, END)
+        password_entry.delete(0, END)
 
-    Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
+        Label(register_screen, text="Registration Success", fg="green", font=("calibri", 11)).pack()
+
+    else:
+        invalid_register()
 
 
 # Implementing event on login button
@@ -88,9 +97,11 @@ def login_verify():
     username_login_entry.delete(0, END)
     password_login_entry.delete(0, END)
 
-    file1 = open("passwords", "r")
+    # TODO password1 = decrypt_password(password1)
+
+    file1 = open("passwords.txt", "r")
     verify = file1.read().splitlines()
-    if password1 in verify:
+    if username1 in verify and verify[verify.index(username1) + 1] == password1:
         login_sucess()
 
     else:
@@ -117,15 +128,15 @@ def invalid_login():
     Button(password_not_recog_screen, text="OK", command=delete_password_not_recognised).pack()
 
 
-# Designing popup for user not found
+# Designing popup for register invalid password
 
-def user_not_found():
-    global user_not_found_screen
-    user_not_found_screen = Toplevel(login_screen)
-    user_not_found_screen.title("Success")
-    user_not_found_screen.geometry("150x100")
-    Label(user_not_found_screen, text="User Not Found").pack()
-    Button(user_not_found_screen, text="OK", command=delete_user_not_found_screen).pack()
+def invalid_register():
+    global register_not_recog_screen
+    register_not_recog_screen = Toplevel(register_screen)
+    register_not_recog_screen.title("Success")
+    register_not_recog_screen.geometry("150x100")
+    Label(register_not_recog_screen, text="Password is weak! ").pack()
+    Button(register_not_recog_screen, text="OK", command=delete_register_not_recognised).pack()
 
 
 # Deleting popups
@@ -138,9 +149,8 @@ def delete_password_not_recognised():
     password_not_recog_screen.destroy()
 
 
-def delete_user_not_found_screen():
-    user_not_found_screen.destroy()
-
+def delete_register_not_recognised():
+    register_not_recog_screen.destroy()
 
 # Designing Main(first) window
 
@@ -158,11 +168,9 @@ def main_account_screen():
     main_screen.mainloop()
 
 
-main_account_screen()
+def main():
+    main_account_screen()
 
-# def main():
-#   print("hello")
-#
-#
-# if __name__ == "__main__":
-#     main()
+
+if __name__ == "__main__":
+    main()
