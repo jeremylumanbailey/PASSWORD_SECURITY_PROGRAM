@@ -5,8 +5,13 @@ import os
 
 
 def valid_password(user_password):
+    if len(user_password) < 8:
+        return False
+    if not any(char.isdigit() for char in user_password):
+        return False
+    if not any(char.isalpha() for char in user_password):
+        return False
     return True
-
 
 # Designing window for registration
 
