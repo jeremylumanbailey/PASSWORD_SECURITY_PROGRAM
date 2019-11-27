@@ -1,7 +1,30 @@
 # import modules
 
 from tkinter import *
-import os
+import hashlib, binascii, os
+
+
+def hash_password(password):
+    """Hash a password for storing."""
+    salt = hashlib.sha256(os.urandom(60)).hexdigest().encode('ascii')
+    pwdhash = hashlib.pbkdf2_hmac('sha512', password.encode('utf-8'),
+                                salt, 100000)
+    pwdhash = binascii.hexlify(pwdhash)
+    return (salt + pwdhash).decode('ascii')
+
+
+def verify_password(stored_password, provided_password):
+    """Verify a stored password against one provided by user"""
+    salt = stored_password[:64]
+    stored_password = stored_password[64:]
+    pwdhash = hashlib.pbkdf2_hmac('sha512',
+                                  provided_password.encode('utf-8'),
+                                  salt.encode('ascii'),
+                                  100000)
+    pwdhash = binascii.hexlify(pwdhash).decode('ascii')
+    return pwdhash == stored_password
+
+
 highly_popular_pws = open("popularpasswords.txt", 'r')
 
 
@@ -13,7 +36,7 @@ def search_common_pws(check_string):
     print("not found common password")
     return False
 
-
+# TODO not allow 4 consecutive numbers of alphanumeric characters e.g abcd1234
 def four_consecutive_chars(check_string):
     count = {}
     for s in check_string:
@@ -108,10 +131,9 @@ def register_user():
     password_info = password.get()
 
     if valid_password(password_info):
-        # TODO password_info = encrypt_password(password_info)
         file = open("passwords.txt", "a")
         file.write("\n" + username_info + "\n")
-        file.write(password_info)
+        file.write(hash_password(password_info))
         file.close()
 
         username_entry.delete(0, END)
@@ -131,11 +153,10 @@ def login_verify():
     username_login_entry.delete(0, END)
     password_login_entry.delete(0, END)
 
-    # TODO password1 = decrypt_password(password1)
-
     file1 = open("passwords.txt", "r")
     verify = file1.read().splitlines()
-    if username1 in verify and verify[verify.index(username1) + 1] == password1:
+    if username1 in verify and verify_password(verify[verify.index(username1) + 1], password1):
+
         login_sucess()
 
     else:
